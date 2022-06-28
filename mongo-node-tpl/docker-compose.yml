@@ -1,0 +1,34 @@
+version: '3.3'
+services:
+  mongo:
+    image: "mongo:latest"
+    restart: "always"
+    networks:
+         ScrahubNetwork:
+            ipv4_address: "172.31.X.10X"
+    # 增加额外启动命令，直接在command后根据Manual添加参数，详情参考 https://hub.docker.com/_/mongo/ 的 Configuration 小节
+    command: "--replSet ScrahubRS --config /etc/mongodb/mongodb.conf --keyFile /etc/mongodb/mongodb-keyfile"
+    # 单机模式参考下一行进行配置
+    # --replSet ScrahubRS 开启oplog复制集，初次启动后需要执行初始化命令：rs.initiate({_id:'rs',members:[{_id:0,host:'192.168.100.141:27017'}]})。其中“192.168.100.141”是宿主机ip。
+    deploy:
+      resources:
+        limits:
+          # cpus: "2"
+          memory: "16G"
+        reservations:
+          memory: "128M"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "root"
+      MONGO_INITDB_ROOT_PASSWORD: "<>?IOP"
+    volumes:
+      - "./data/db:/data/db"  # make data persistent 持久化
+      - "./logs:/var/log/mongodb"  # make data persistent 持久化
+      - "./conf:/etc/mongodb"  # make data persistent 持久化
+    ports:
+      - "7018:27017"  # expose port to host machine 暴露接口到宿主机
+
+networks:
+   ScrahubNetwork:
+      ipam:
+         config:
+         - subnet: "172.31.X.0/24"

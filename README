@@ -1,0 +1,44 @@
+创建集群密钥
+# openssl rand -base64 741 > mongo-node1/conf/mongodb-keyfile
+# chmod 600 mongo-node1/conf/mongodb-keyfile
+# sudo chown 999 mongo-node1/conf/mongodb-keyfile
+将密钥复制到其它节点
+# sudo cp mongo-node1/conf/mongodb-keyfile mongo-node2/conf/
+# sudo chown 999 mongo-node2/conf/mongodb-keyfile
+启动主结点
+# cd mongo-node1
+# docker-compose up -d
+启动第二个结点
+# cd ../mongo-node2/
+# docker-compose up -d
+切换至node1的docker中进行初始化
+# cd ../mongo-node1/
+# docker exec -it <containerid> bash
+# mongo
+# use admin;
+# db.auth("root", "<>?IOP");
+# rs.initiate();	//副本集初始化
+# rs.conf();		//查看本副本集状态，或rs.status()
+# cfg = rs.conf()
+# cfg.members[0].host = "172.31.1.1:7017"	//更改自身注册地址，因container内的ip无法互通，通过映射在node1的网关的端口进行通讯
+# rs.reconfig(cfg)
+# rs.add("172.31.1.1:7018");	//加入node2，ip原因同上
+# rs.status();	//查看集群状态，刚加入的node2的stateStr成为了SECONDARY
+查看node2结点状态
+# cd ../mongo-node2/
+# docker exec -it <containerid> bash
+# mongo	//进入后即可发现其提示符变为了SECONDARY
+# rs.secondaryOk() // 允许读取操作在从节点执行
+验证集群运作
+在主节点添加一条记录：
+# use test;	//先使用admin表验证身份
+# db.tmptable.insert({"name":"helloworld"})
+# show dbs;
+# show collections;
+从node2查看数据同步情况：
+# rs.secondaryOK();	//先使用admin表验证身份
+# use test;
+# db.tmptable.find();
+
+
+
