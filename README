@@ -7,10 +7,10 @@
 # sudo chown 999 mongo-node2/conf/mongodb-keyfile
 启动主结点
 # cd mongo-node1
-# docker-compose up -d
+# docker-compose --compatibility up -d
 启动第二个结点
 # cd ../mongo-node2/
-# docker-compose up -d
+# docker-compose --compatibility up -d
 切换至node1的docker中进行初始化
 # cd ../mongo-node1/
 # docker exec -it <containerid> bash
