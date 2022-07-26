@@ -1,3 +1,8 @@
+
+注意：
+(1)需要正确配置docker-compose.yml中memory参数及conf/mongodb.conf中wiredTigerCacheSizeGB参数，其中务必保证后者不要超过物理内存大小。
+(2)chmod 777 logs
+
 创建集群密钥
 # openssl rand -base64 741 > mongo-node1/conf/mongodb-keyfile
 # chmod 600 mongo-node1/conf/mongodb-keyfile
@@ -41,7 +46,6 @@
 # db.tmptable.find();
 
 
-注意：需要正确配置docker-compose.yml中memory参数及conf/mongodb.conf中wiredTigerCacheSizeGB参数，其中务必保证后者不要超过物理内存大小。
 
 
 
