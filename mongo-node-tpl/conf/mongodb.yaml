@@ -1,0 +1,24 @@
+net:
+  #bindIp: 0.0.0.0
+  port: 27017
+  #maxIncomingConnections: <NUM>
+security:
+  #keyFile: "/data/mongodb-keyfile" #--指定分片集或副本集成员之间身份验证的key文件存储位置
+  #clusterAuthMode: "keyFile"       #--集群认证模式，默认是keyFile
+  authorization: "enabled"        #--访问数据库和进行操作的用户角色认证
+storage:
+  wiredTiger:
+      engineConfig:
+         cacheSizeGB: 12
+replication:
+   oplogSizeMB: 512
+   #enableMajorityReadConcern: false
+systemLog:
+  #verbosity: 0
+  quiet: true
+  destination: "file"
+  logAppend: true
+  logRotate: "reopen"
+  path: "/var/log/mongodb/mongodb.log"
+processManagement: 
+  pidFilePath: "/var/log/mongodb/mongod.pid"

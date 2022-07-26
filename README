@@ -2,6 +2,7 @@
 注意：
 (1)需要正确配置docker-compose.yml中memory参数及conf/mongodb.conf中wiredTigerCacheSizeGB参数，其中务必保证后者不要超过物理内存大小。
 (2)chmod 777 logs
+(3)所用镜像中没有安装logrotate例程，因此需要变更log日志文件时可在mongoshell中执行db.adminCommand( { logRotate : 1 } )
 
 创建集群密钥
 # openssl rand -base64 741 > mongo-node1/conf/mongodb-keyfile
