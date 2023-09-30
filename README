@@ -1,9 +1,14 @@
 
 注意：
 (1)需要正确配置docker-compose.yml中memory参数及conf/mongodb.conf中wiredTigerCacheSizeGB参数，其中务必保证后者不要超过物理内存大小。
-(2)chmod 777 logs
-(3)所用镜像中没有安装logrotate例程，因此需要变更log日志文件时可在mongoshell中执行db.adminCommand( { logRotate : 1 } )
+(2)所用镜像中没有安装logrotate例程，因此需要变更log日志文件时可在mongoshell中执行db.adminCommand( { logRotate : 1 } )
+(3)新版使用 percona-server-mongodb 镜像而不是使用 mongo 镜像时，需要将以下 mongodb-keyfile、logs、mongobackups、data/db 的所有者从 999 改为 1001
 
+创建文件夹及更改权限
+# mkdir logs mongobackups
+# chown 999 logs
+# chown 999 mongobackups
+# chown 999 data/db
 创建集群密钥
 # openssl rand -base64 741 > mongo-node1/conf/mongodb-keyfile
 # chmod 600 mongo-node1/conf/mongodb-keyfile
@@ -46,6 +51,16 @@
 # use test;
 # db.tmptable.find();
 
+
+注意：
+生产环境及数据量大的情况下添加节点时，建议将priority及votes设为0,即不会选为主（priority默认1）、也没有投票特性（votes默认1，有投票权）。
+test12:PRIMARY> rs.add( { host: "192.168.56.197:27017", priority: 0, votes: 0 } )
+同步数据的过程中，新节点的状态stateStr 为STARTUP2，待同步完成后会变为SECONDARY。
+此时再用rs.config()查看新节点状态，priority及votes是之前设的0，可以使用 rs.recofig()命令进行调整。
+var cfg = rs.conf()
+cfg.members[3].priority = 1
+cfg.members[3].votes = 1
+rs.reconfig(cfg)
 
 
 

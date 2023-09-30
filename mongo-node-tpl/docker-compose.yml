@@ -1,7 +1,8 @@
 version: '3.3'
 services:
   mongo:
-    image: "mongo:latest"
+    # image: "mongo:latest"
+    image: "percona/percona-server-mongodb:5.0"
     restart: "always"
     networks:
          ScrahubNetwork:
@@ -26,6 +27,7 @@ services:
       - "./conf/mongodb.yaml:/etc/mongodb.yaml"  # make config persistent
       - "./conf/mongodb-keyfile:/etc/mongodb-keyfile"  # make config persistent
       - "./conf/logrotate-mongod.conf:/etc/logrotate.d/logrotate-mongod.conf"  # make config persistent
+      - "./mongobackups:/backups" # for incremental backup using PBM-Agent
     ports:
       - "7018:27017"  # expose port to host machine 暴露接口到宿主机
 
