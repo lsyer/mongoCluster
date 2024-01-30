@@ -1,0 +1,34 @@
+使用PBM备份mongodb数据库
+
+使用PBM能够较方便备份mongodb数据，但需要启用replicaset。mongodb安装及配置略，PBM安装及配置主要过程如下：
+curl -O https://repo.percona.com/apt/percona-release_latest.generic_all.deb
+sudo apt install ./percona-release_latest.generic_all.deb 
+sudo percona-release enable pbm release
+sudo apt update
+sudo apt install percona-backup-mongodb
+sudo vi /etc/default/pbm-agent #写入PBM_MONGODB_URI="mongodb://user:pwd@localhost:7017/?authSource=admin&replicaSet=MyRS"，其中user/pwd/MyRS按实际填写
+touch pbm.env
+vi pbm.env #写入EXPORT PBM_MONGODB_URI="mongodb://user:pwd@localhost:7017/?authSource=admin&replicaSet=MyRS"，其中user/pwd/MyRS按实际填写
+source pbm.env
+pbm status
+sudo mkdir /srv/backups/mongobackups
+sudo chmod a+wr /srv/backups/mongobackups/
+touch pbm.config.yaml
+vi pbm.config.yaml 
+pbm config --file pbm.config.yaml 
+sudo systemctl enable pbm-agent.service 
+sudo service pbm-agent start
+pbm status
+其它基本备份命令参考https://docs.percona.com/percona-backup-mongodb/intro.html。
+
+注意：
+（1）备份PITR以及使用物理备份时，需要在同一台服务器上运行，不能使用docker（或把db映射出来，或在docker内安装和运行pbm）；
+（2）从Mongodb社区版升级到PSMDB时，需要将./data/db和./conf/mongodb-keyfile所有者改为1001:root；
+（3）pbm默认使用mongod用户执行备份命令，在启用pitr后建议su为mongod用户执行pbm相关命令，否则可能会出现权限错误。
+
+
+23、41备份：
+1. docker exec -it mongo-node-master-mongo-1 bash
+2. （23）export PBM_MONGODB_URI="mongodb://root:%3C%3E%3FIOP@localhost:27017/?authSource=admin&replicaSet=ScrahubRS" （41）export PBM_MONGODB_URI="mongodb://root:%3C%3E%3FIOP@localhost:27017/?authSource=admin&replicaSet=GatherRS"
+3. pbm-agent &
+4. pbm backup --type incremental

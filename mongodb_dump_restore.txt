@@ -1,0 +1,8 @@
+mongodump --host 192.168.0.41 -d scrahub_db -c relations -o /data/backups/mongo4bak/
+mongorestore -h 192.168.0.23 -u "root" --port 7017 --authenticationDatabase "admin" -p "<>?IOP" -d personality --dir ./personality/
+
+cat collections.txt |awk '{print "mongodump --host 192.168.0.41 -d scrahub_db -c "$0" -o /data/backups/mongo4bak/"}' | sh
+cat others.txt |awk -F' ' '{print "mongorestore -h 192.168.0.41 -u \"root\" --port 7017 --authenticationDatabase \"admin\" -p \"<>?IOP\" -d scrahub_db -c "$1" --dir ./scrahub_db/"$1".bson"}' | sh
+cat wxh.txt |awk -F' ' '{print "mongorestore -h 192.168.0.41 -u \"root\" --port 7017 --authenticationDatabase \"admin\" -p \"<>?IOP\" -d GatherDB -c "$1" --dir ./scrahub_db/"$1".bson"}' | sh
+cat ysj.txt |awk -F' ' '{print "mongorestore -h 192.168.0.23 -u \"root\" --port 7017 --authenticationDatabase \"admin\" -p \"<>?IOP\" -d AnalysisDB -c "$1" --dir ./scrahub_db/"$1".bson"}' | sh
+

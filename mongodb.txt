@@ -1,0 +1,32 @@
+db.logs.find({"ts":{"$gt":ISODate("2020-09-01T00:00:00Z")}}).limit(5)
+db.logs.deleteMany({"_id":{"$lt":ObjectId("5f4d92fdb8b371001be7efd2")}})
+db.logs.createIndex({"expire_ts":1},{expireAfterSeconds: 60*60*24*6}) #6天后过期，自动删除当前记录
+
+db.my_collection.createIndex( { "createdAt": 1 }, { expireAfterSeconds: 15 } )
+db.my_collection.insert( {    "createdAt": new Date(),    "dataExample": 1,    "Message": "Success!" } )
+db.my_collection.insert( {    "createdAt": new Date(),    "dataExample": 2,    "Message": "Success!" } )
+db.my_collection.insert( {    "createdAt": new Date(),    "dataExample": 3,    "Message": "Success!" } )
+db.my_collection.find();
+	{ "_id" : ObjectId("62b3c6a1f58826908d4771a9"), "createdAt" : ISODate("2022-06-23T01:49:21.681Z"), "dataExample" : 2, "Message" : "Success!" }
+	{ "_id" : ObjectId("62b3c6a7f58826908d4771aa"), "createdAt" : ISODate("2022-06-23T01:49:27.675Z"), "dataExample" : 3, "Message" : "Success!" }
+	
+lock数据库：
+db.fsyncLock();
+
+
+
+
+查找字符串
+db.translations.find({"lang-B":{ $regex: /plural, 1/ }}).pretty()
+db.translations.find({"lang-B":{$regex:"plural, 1"}}).pretty()
+
+
+替换字符串
+db.translations.find({"lang-B":{ $regex: /plural, 1/ }}).forEach(function(doc) {
+  for (var field in doc) {
+    if (typeof(doc[field]) === 'string' && field === "lang-B") {
+      doc[field] = doc[field].replace(/plural, 1/g, 'plural, =1');
+    }
+  }
+  db.translations.save(doc);
+});
